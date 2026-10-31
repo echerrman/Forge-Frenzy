@@ -12,6 +12,7 @@ Controls:
 - Left-click buttons and workshop hotspots.
 - Escape returns to the previous screen; on the main menu it quits.
 - The window close button quits.
+- Select Tutorial in the lower-right corner of the main menu for a guided Day 1.
 
 Implemented through Phases 3 and 4:
 - 1280x720, 60 FPS Pygame application with delta-time updates.
@@ -30,6 +31,7 @@ Implemented through Phases 3 and 4:
 - Delivery validation, configurable weighted scoring, gold, reputation, and customer responses.
 - Results screen, end-of-day summary, Day 2 continuation, and queued customers.
 - Fullscreen and windowed display options with scaled rendering.
+- Guided tutorial day with dimmed unavailable controls, highlighted objectives, and contextual instructions.
 
 Testing summary: see the current phase report for tests actually executed.
 

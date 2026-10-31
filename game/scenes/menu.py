@@ -15,6 +15,7 @@ class MainMenuScene(BaseScene):
             Button((505, 490, 270, 55), "Options", font, lambda: app.scenes.switch("options")),
             Button((505, 560, 270, 55), "Quit", font, app.request_quit, config.RED),
         ]
+        self.tutorial_button = Button((1030, 640, 220, 52), "Tutorial", app.assets.font(23, True), app.start_tutorial)
         self.elapsed = 0.0
 
     def handle_event(self, event):
@@ -22,6 +23,7 @@ class MainMenuScene(BaseScene):
             self.app.request_quit()
         for button in self.buttons:
             button.handle_event(event)
+        self.tutorial_button.handle_event(event)
 
     def update(self, delta_time):
         self.elapsed += delta_time
@@ -38,6 +40,7 @@ class MainMenuScene(BaseScene):
         text(surface, "A medieval blacksmith workshop", self.app.assets.font(18), config.METAL, (640, 665), True)
         for button in self.buttons:
             button.draw(surface)
+        self.tutorial_button.draw(surface)
 
 
 class InstructionsScene(BaseScene):

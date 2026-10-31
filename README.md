@@ -42,6 +42,8 @@ No external artwork or network service is required. The current visuals are draw
 
 The introductory order is an iron dagger for Elin. The workpiece remains in the **Current Work** hotbar while navigating between screens.
 
+New players can select **Tutorial** in the lower-right corner of the main menu. The tutorial plays through Day 1 while dimming unavailable controls, highlighting the current objective, and explaining order details and each new station interaction.
+
 ### Station controls
 
 - **Storage:** Click an iron or steel ingot in its storage bin.

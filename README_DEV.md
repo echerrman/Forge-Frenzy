@@ -15,6 +15,8 @@ Controls: left-click buttons and workshop hotspots. Escape goes back; Escape on 
 
 Start a workday, accept the displayed order at the Customer Counter, click a metal ingot in Storage, and follow the order ticket through the stations. The active customer, order, patience, inventory, station progress, and workpiece location remain intact while navigating scenes.
 
+The main-menu Tutorial starts a fresh guided Day 1. `TutorialManager` gates mouse input to highlighted regions, observes real gameplay state for completion, and returns to a clean main-menu state after the tutorial summary.
+
 ## Station controls
 
 - Storage: click an iron or steel ingot in its storage bin.

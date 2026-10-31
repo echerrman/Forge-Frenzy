@@ -5,6 +5,7 @@ from game import config
 from game.assets import AssetManager
 from game.scene_manager import SceneManager
 from game.state import GameState
+from game.tutorial import TutorialManager
 from game.scenes.menu import InstructionsScene, MainMenuScene
 from game.scenes.menu import OptionsScene
 from game.scenes.results_scene import ResultsScene
@@ -23,6 +24,7 @@ class GameApp:
         pygame.display.set_caption(config.TITLE)
         self.clock = pygame.time.Clock()
         self.assets = AssetManager()
+        self.tutorial = TutorialManager(self.assets)
         self.game_state = GameState()
         self.scenes = SceneManager()
         self.running = False
@@ -38,6 +40,17 @@ class GameApp:
     def start_or_resume_workday(self):
         self.game_state.start_day()
         self.scenes.switch("shop")
+
+    def start_tutorial(self):
+        self.game_state = GameState()
+        self.game_state.start_day()
+        self.tutorial.start()
+        self.scenes.switch("shop")
+
+    def finish_tutorial(self):
+        self.tutorial.stop()
+        self.game_state = GameState()
+        self.scenes.switch("menu")
 
     def request_quit(self):
         self.running = False
@@ -94,8 +107,12 @@ class GameApp:
                 if event.type == pygame.QUIT:
                     self.request_quit()
                 else:
-                    self.scenes.handle_event(self._logical_event(event))
+                    logical_event = self._logical_event(event)
+                    if self.tutorial.allow_event(logical_event):
+                        self.scenes.handle_event(logical_event)
             self.scenes.update(delta_time)
+            self.tutorial.update(self.scenes.active_name, self.game_state)
             self.scenes.draw(self.canvas)
+            self.tutorial.draw(self.canvas)
             self._present()
         pygame.quit()

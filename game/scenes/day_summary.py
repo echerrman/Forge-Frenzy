@@ -13,6 +13,9 @@ class DaySummaryScene(BaseScene):
         self.continue_button = Button((470, 610, 340, 58), "Begin Next Day", app.assets.font(24, True), self._next_day)
 
     def _next_day(self):
+        if self.app.tutorial.active:
+            self.app.finish_tutorial()
+            return
         try:
             self.app.game_state.advance_day()
             self.app.scenes.switch("shop")
@@ -43,4 +46,5 @@ class DaySummaryScene(BaseScene):
             y = 220 + index * 57
             text(surface, label, self.app.assets.font(23), config.INK, (375, y))
             text(surface, value, self.app.assets.font(23, True), config.INK, (850, y), True)
+        self.continue_button.label = "Finish Tutorial" if self.app.tutorial.active else "Begin Next Day"
         self.continue_button.draw(surface)

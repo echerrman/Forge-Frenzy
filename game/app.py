@@ -43,13 +43,11 @@ class GameApp:
         self.running = False
 
     def set_display_mode(self, mode):
-        if mode not in ("windowed", "borderless", "fullscreen"):
+        if mode not in ("windowed", "fullscreen"):
             raise ValueError("Unknown display mode")
         desktop = pygame.display.get_desktop_sizes()[0]
         if mode == "windowed":
             size, flags = (config.WIDTH, config.HEIGHT), 0
-        elif mode == "borderless":
-            size, flags = desktop, pygame.NOFRAME
         else:
             size, flags = desktop, pygame.FULLSCREEN
         try:

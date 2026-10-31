@@ -42,8 +42,9 @@ def test_complete_initial_dagger_through_all_station_controllers():
 
     grind = GrindController(item, order)
     assert grind.place()
-    for index in range(grind.target_count):
-        grind.sharpen(index)
+    for _ in range(grind.required_cranks):
+        grind.crank()
+    grind.sharpen_sweep(grind.required_sweep_distance)
 
     assembly = AssemblyController(item, order)
     assert assembly.place()
@@ -67,3 +68,20 @@ def test_quench_requires_one_continuous_hold():
     assert quench.progress > 0
     quench.release_early()
     assert quench.progress == 0
+
+
+def test_grindstone_spin_resets_on_reentry_but_sharpening_persists():
+    state = prepared_state()
+    item = state.active_workpiece
+    for station in ("furnace", "mold", "anvil", "quench"):
+        item.complete_station(station, 100)
+    grind = GrindController(item, state.active_order)
+    grind.place()
+    for _ in range(grind.required_cranks):
+        grind.crank()
+    grind.sharpen_sweep(300)
+    saved_progress = grind.progress
+
+    returned = GrindController(item, state.active_order)
+    assert not returned.spinning
+    assert returned.progress == saved_progress

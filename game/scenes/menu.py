@@ -74,10 +74,9 @@ class OptionsScene(BaseScene):
         super().__init__(app)
         font = app.assets.font(24, True)
         self.buttons = [
-            Button((455, 240, 370, 58), "Fullscreen", font, lambda: app.set_display_mode("fullscreen")),
-            Button((455, 325, 370, 58), "Windowed Fullscreen", font, lambda: app.set_display_mode("borderless")),
-            Button((455, 410, 370, 58), "Windowed", font, lambda: app.set_display_mode("windowed")),
-            Button((515, 555, 250, 54), "Back", font, lambda: app.scenes.switch("menu")),
+            Button((455, 275, 370, 58), "Fullscreen", font, lambda: app.set_display_mode("fullscreen")),
+            Button((455, 370, 370, 58), "Windowed", font, lambda: app.set_display_mode("windowed")),
+            Button((515, 525, 250, 54), "Back", font, lambda: app.scenes.switch("menu")),
         ]
 
     def handle_event(self, event):
@@ -89,6 +88,6 @@ class OptionsScene(BaseScene):
     def draw(self, surface):
         surface.fill(config.CHARCOAL)
         text(surface, "DISPLAY OPTIONS", self.app.assets.font(46, True), config.CREAM, (640, 105), True)
-        text(surface, f"Current mode: {self.app.display_mode.replace('borderless', 'windowed fullscreen').title()}", self.app.assets.font(21), config.ORANGE_HOVER, (640, 175), True)
+        text(surface, f"Current mode: {self.app.display_mode.title()}", self.app.assets.font(21), config.ORANGE_HOVER, (640, 175), True)
         for button in self.buttons:
             button.draw(surface)

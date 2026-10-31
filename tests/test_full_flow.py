@@ -6,7 +6,7 @@ import pygame
 
 from game.app import GameApp
 from game.items import WeaponStage
-from game.scenes.station_scene import ANVIL_TARGETS, GRIND_TARGETS
+from game.scenes.station_scene import ANVIL_TARGETS
 
 
 def click(scene, position):
@@ -49,14 +49,21 @@ def test_initial_order_can_be_completed_through_mouse_workflow():
     click(app.scenes.active_scene, (620, 655))
     scene = app.scenes.active_scene
     scene.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(460, 240)))
-    scene.handle_event(pygame.event.Event(pygame.MOUSEMOTION, pos=(450, 420), rel=(0, 180), buttons=(1, 0, 0)))
+    scene.handle_event(pygame.event.Event(pygame.MOUSEMOTION, pos=(800, 600), rel=(340, 360), buttons=(1, 0, 0)))
+    assert scene.drag_position == (450, 405)
     scene.update(3.0)
-    scene.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=(450, 420)))
+    scene.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=(800, 600)))
+    assert scene.drag_position == (450, 242)
 
     app.scenes.switch("station", station="grindstone")
     click(app.scenes.active_scene, (620, 655))
-    for target in GRIND_TARGETS:
-        click(app.scenes.active_scene, target)
+    scene = app.scenes.active_scene
+    for _ in range(7):
+        click(scene, (170, 335))
+    scene.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=(470, 255)))
+    for x in (650, 355, 650, 355):
+        scene.handle_event(pygame.event.Event(pygame.MOUSEMOTION, pos=(x, 255), rel=(0, 0), buttons=(1, 0, 0)))
+    scene.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=(355, 255)))
 
     app.scenes.switch("station", station="assembly")
     click(app.scenes.active_scene, (620, 655))

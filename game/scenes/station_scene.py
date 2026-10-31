@@ -1,5 +1,6 @@
 """Interactive work screens for the complete sample-order workflow."""
 
+import math
 import pygame
 
 from game import config
@@ -15,7 +16,7 @@ AREA_INFO = {
     "mold": ("Weapon Mold", "Choose the matching mold, insert the metal, then hold the ladle until full."),
     "anvil": ("Anvil", "Place the blade, then click every glowing hammer point."),
     "quench": ("Quench Tub", "Place the blade, drag it into the water, and hold until quenched."),
-    "grindstone": ("Grindstone", "Place the blade, then click each edge marker to sharpen it."),
+    "grindstone": ("Grindstone", "Place the blade, crank the wheel to full speed, then sweep the edge left and right."),
     "assembly": ("Assembly Bench", "Place the blade, then drag the requested handle and guard onto it."),
 }
 
@@ -26,11 +27,18 @@ MOLD_RECT = pygame.Rect(265, 310, 360, 170)
 ANVIL_RECT = pygame.Rect(220, 315, 485, 145)
 QUENCH_WATER = pygame.Rect(230, 340, 440, 170)
 QUENCH_BLADE = pygame.Rect(330, 210, 260, 65)
-GRIND_RECT = pygame.Rect(225, 215, 460, 300)
+QUENCH_TRACK_X = QUENCH_WATER.centerx
+QUENCH_TOP_Y = QUENCH_BLADE.centery
+QUENCH_SUBMERGED_Y = 405
+GRIND_WHEEL_CENTER = (500, 375)
+GRIND_WHEEL_RADIUS = 135
+GRIND_CRANK = pygame.Rect(105, 255, 135, 175)
+GRIND_BLADE_Y = 255
+GRIND_MIN_X = 355
+GRIND_MAX_X = 650
 ASSEMBLY_BLADE = pygame.Rect(300, 270, 390, 130)
 
 ANVIL_TARGETS = [(310, 330), (390, 350), (470, 330), (550, 350), (630, 330)]
-GRIND_TARGETS = [(320, 275), (380, 255), (440, 275), (500, 255), (560, 275), (620, 255)]
 
 
 class StationScene(BaseScene):
@@ -41,7 +49,9 @@ class StationScene(BaseScene):
         self.feedback = ""
         self.holding_pour = False
         self.dragging_quench = False
-        self.drag_position = (460, 250)
+        self.drag_position = (QUENCH_TRACK_X, QUENCH_TOP_Y)
+        self.dragging_grind = False
+        self.grind_position = (470, GRIND_BLADE_Y)
         self.drag_component = None
         self.back = Button((25, 642, 230, 48), "Back to Workshop", app.assets.font(20, True), lambda: app.scenes.switch("shop"))
 
@@ -54,6 +64,8 @@ class StationScene(BaseScene):
             self.feedback = "Station complete — the workpiece is back in Current Work."
         self.holding_pour = False
         self.dragging_quench = False
+        self.dragging_grind = False
+        self.grind_position = (470, GRIND_BLADE_Y)
         self.drag_component = None
 
     def _refresh_controller(self):
@@ -131,13 +143,17 @@ class StationScene(BaseScene):
                 workpiece = self.app.game_state.active_workpiece
                 if workpiece and workpiece.location == "quench":
                     self.dragging_quench = True
-                    self.drag_position = pos
+                    self.drag_position = (QUENCH_TRACK_X, max(QUENCH_TOP_Y, min(QUENCH_SUBMERGED_Y, pos[1])))
             elif self.station == "grindstone":
-                for index, target in enumerate(GRIND_TARGETS):
-                    if pygame.Vector2(pos).distance_to(target) <= 30:
-                        self.controller.sharpen(index)
-                        self.feedback = self.controller.feedback
-                        break
+                if GRIND_CRANK.collidepoint(pos):
+                    self.controller.crank()
+                    self.feedback = self.controller.feedback
+                else:
+                    blade_rect = pygame.Rect(0, 0, 300, 70)
+                    blade_rect.center = self.grind_position
+                    workpiece = self.app.game_state.active_workpiece
+                    if workpiece and workpiece.location == "grindstone" and blade_rect.collidepoint(pos):
+                        self.dragging_grind = True
             elif self.station == "assembly":
                 for kind, value, rect in self._component_cards():
                     if rect.collidepoint(pos):
@@ -146,17 +162,29 @@ class StationScene(BaseScene):
                         break
 
         elif event.type == pygame.MOUSEMOTION:
-            if self.dragging_quench or self.drag_component:
+            if self.dragging_quench:
+                y = max(QUENCH_TOP_Y, min(QUENCH_SUBMERGED_Y, event.pos[1]))
+                self.drag_position = (QUENCH_TRACK_X, y)
+            elif self.dragging_grind:
+                old_x = self.grind_position[0]
+                new_x = max(GRIND_MIN_X, min(GRIND_MAX_X, event.pos[0]))
+                self.grind_position = (new_x, GRIND_BLADE_Y)
+                self.controller.sharpen_sweep(new_x - old_x)
+                self.feedback = self.controller.feedback
+                if self.controller.completed:
+                    self.dragging_grind = False
+            elif self.drag_component:
                 self.drag_position = event.pos
 
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             self.holding_pour = False
+            self.dragging_grind = False
             if self.dragging_quench:
                 if not (self.controller and self.controller.completed):
                     self.controller.release_early()
                     self.feedback = self.controller.feedback
                 self.dragging_quench = False
-                self.drag_position = QUENCH_BLADE.center
+                self.drag_position = (QUENCH_TRACK_X, QUENCH_TOP_Y)
             if self.drag_component:
                 kind, value = self.drag_component
                 target = self._assembly_target(kind)
@@ -175,8 +203,10 @@ class StationScene(BaseScene):
             self.controller.update(delta_time)
         elif self.station == "mold" and self.holding_pour:
             self.controller.pour(delta_time)
-        elif self.station == "quench" and self.dragging_quench and QUENCH_WATER.collidepoint(self.drag_position):
+        elif self.station == "quench" and self.dragging_quench and self.drag_position[1] >= QUENCH_SUBMERGED_Y:
             self.controller.hold_in_water(delta_time)
+        elif self.station == "grindstone":
+            self.controller.update(delta_time)
         if self.controller.feedback:
             self.feedback = self.controller.feedback
 
@@ -283,22 +313,44 @@ class StationScene(BaseScene):
         pygame.draw.rect(surface, config.WOOD, QUENCH_WATER.inflate(30, 30), border_radius=28)
         pygame.draw.rect(surface, (61, 132, 165), QUENCH_WATER, border_radius=20)
         pygame.draw.line(surface, (133, 205, 218), (QUENCH_WATER.x + 20, QUENCH_WATER.y + 35), (QUENCH_WATER.right - 20, QUENCH_WATER.y + 35), 4)
+        pygame.draw.line(surface, (107, 91, 74), (QUENCH_TRACK_X, QUENCH_TOP_Y), (QUENCH_TRACK_X, QUENCH_SUBMERGED_Y), 3)
         workpiece = self.app.game_state.active_workpiece
         if workpiece and workpiece.location == "quench":
-            position = self.drag_position if self.dragging_quench else QUENCH_BLADE.center
+            position = self.drag_position if self.dragging_quench else (QUENCH_TRACK_X, QUENCH_TOP_Y)
             draw_workpiece(surface, position, workpiece, 1.0)
-        text(surface, "DRAG BLADE INTO WATER AND KEEP HOLDING", self.app.assets.font(17, True), config.CREAM, (450, 545), True)
+        text(surface, "DRAG STRAIGHT DOWN AND KEEP HOLDING", self.app.assets.font(17, True), config.CREAM, (450, 545), True)
 
     def _draw_grindstone(self, surface):
-        pygame.draw.circle(surface, (112, 115, 111), (455, 360), 145)
-        pygame.draw.circle(surface, config.PANEL, (455, 360), 30)
+        pygame.draw.rect(surface, config.WOOD, GRIND_CRANK, border_radius=12)
+        pygame.draw.rect(surface, (67, 43, 27), GRIND_CRANK, 7, border_radius=12)
+        text(surface, "CRANK", self.app.assets.font(18, True), config.CREAM, (GRIND_CRANK.centerx, GRIND_CRANK.y + 25), True)
+        crank_center = (GRIND_CRANK.centerx, GRIND_CRANK.centery + 15)
+        pygame.draw.circle(surface, config.METAL, crank_center, 34, 7)
+        pygame.draw.line(surface, config.METAL, crank_center, (crank_center[0] + 42, crank_center[1] - 35), 8)
+        for index in range(self.controller.required_cranks):
+            color = config.ORANGE if index < self.controller.crank_clicks else (80, 72, 65)
+            pygame.draw.circle(surface, color, (GRIND_CRANK.x + 18 + index * 16, GRIND_CRANK.bottom - 24), 6)
+
+        pygame.draw.circle(surface, (112, 115, 111), GRIND_WHEEL_CENTER, GRIND_WHEEL_RADIUS)
+        pygame.draw.circle(surface, (176, 179, 173), GRIND_WHEEL_CENTER, GRIND_WHEEL_RADIUS, 7)
+        angle = math.radians(self.controller.wheel_angle)
+        for offset in (0, math.pi / 2):
+            dx = math.cos(angle + offset) * (GRIND_WHEEL_RADIUS - 16)
+            dy = math.sin(angle + offset) * (GRIND_WHEEL_RADIUS - 16)
+            pygame.draw.line(surface, (78, 80, 78), (GRIND_WHEEL_CENTER[0] - dx, GRIND_WHEEL_CENTER[1] - dy), (GRIND_WHEEL_CENTER[0] + dx, GRIND_WHEEL_CENTER[1] + dy), 5)
+        pygame.draw.circle(surface, config.PANEL, GRIND_WHEEL_CENTER, 28)
         workpiece = self.app.game_state.active_workpiece
         if workpiece and workpiece.location == "grindstone":
-            draw_workpiece(surface, (470, 265), workpiece, 1.2)
-        hits = self.controller.hits if self.controller else set()
-        for index, point in enumerate(GRIND_TARGETS):
-            color = (87, 177, 96) if index in hits else config.ORANGE_HOVER
-            pygame.draw.circle(surface, color, point, 17)
+            draw_workpiece(surface, self.grind_position, workpiece, 1.2)
+        if self.dragging_grind and self.controller.spinning:
+            spark_x = max(GRIND_WHEEL_CENTER[0] - 90, min(GRIND_WHEEL_CENTER[0] + 90, self.grind_position[0]))
+            for dx, dy in ((-24, -32), (-10, -42), (12, -38), (28, -25)):
+                pygame.draw.line(surface, config.ORANGE_HOVER, (spark_x, 290), (spark_x + dx, 290 + dy), 3)
+        if self.controller.spinning:
+            prompt = "HOLD THE BLADE AND SWEEP LEFT / RIGHT"
+        else:
+            prompt = f"CLICK THE CRANK {self.controller.required_cranks - self.controller.crank_clicks} MORE TIMES"
+        text(surface, prompt, self.app.assets.font(17, True), config.CREAM, (500, 545), True)
 
     def _component_cards(self):
         order = self.app.game_state.active_order

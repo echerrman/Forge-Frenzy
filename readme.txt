@@ -29,7 +29,7 @@ Implemented through Phases 3 and 4:
 - Penalty-free introductory station interactions with progress indicators.
 - Delivery validation, configurable weighted scoring, gold, reputation, and customer responses.
 - Results screen, end-of-day summary, Day 2 continuation, and queued customers.
-- Fullscreen, windowed fullscreen, and windowed display options with scaled rendering.
+- Fullscreen and windowed display options with scaled rendering.
 
 Testing summary: see the current phase report for tests actually executed.
 
@@ -39,7 +39,7 @@ Detailed controls:
 - Mold: select the matching mold, insert the item, and hold the ladle until full.
 - Anvil: place the blade and click every glowing hotspot.
 - Quench: place the blade, drag it into the water, and hold continuously.
-- Grindstone: place the blade and click each edge marker.
+- Grindstone: place the blade, click the crank seven times, then hold and sweep the blade left and right across the wheel.
 - Assembly: place the blade and drag the requested components onto the target boxes.
 - Counter: click to accept an order or deliver an assembled weapon.
 

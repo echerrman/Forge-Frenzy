@@ -102,24 +102,49 @@ class QuenchController(StationController):
 
 class GrindController(StationController):
     name = "grindstone"
-    target_count = 6
+    required_cranks = 7
+    required_sweep_distance = 900.0
+
+    def __init__(self, workpiece, order=None):
+        super().__init__(workpiece, order)
+        self.crank_clicks = 0
+        self.wheel_angle = 0.0
 
     @property
-    def hits(self):
-        if not self.workpiece:
-            return set()
-        return set(self.workpiece.station_data.setdefault(self.name, {}).get("hits", []))
+    def spinning(self):
+        return self.crank_clicks >= self.required_cranks
 
-    def sharpen(self, index):
+    @property
+    def spin_progress(self):
+        return min(1.0, self.crank_clicks / self.required_cranks)
+
+    def crank(self):
+        if self.completed:
+            self.feedback = "Grinding is already complete."
+            return
+        if self.spinning:
+            self.feedback = "The grindstone is spinning at full speed."
+            return
+        self.crank_clicks += 1
+        if self.spinning:
+            self.feedback = "Wheel ready! Hold the blade and sweep it back and forth."
+        else:
+            self.feedback = f"Crank the wheel: {self.crank_clicks}/{self.required_cranks}"
+
+    def update(self, delta_time):
+        if self.spinning:
+            self.wheel_angle = (self.wheel_angle + delta_time * 420.0) % 360.0
+
+    def sharpen_sweep(self, distance):
         if not self.workpiece or self.workpiece.location != self.name or self.completed:
             self.feedback = "Place the quenched blade at the grindstone first."
             return
-        hits = self.hits
-        hits.add(index)
-        self.workpiece.station_data[self.name]["hits"] = sorted(hits)
-        self.progress = len(hits) / self.target_count
-        self.feedback = f"Edge markers: {len(hits)}/{self.target_count}"
-        if len(hits) >= self.target_count:
+        if not self.spinning:
+            self.feedback = "Crank the grindstone to full speed first."
+            return
+        self.progress += abs(float(distance)) / self.required_sweep_distance
+        self.feedback = "Keep sweeping the edge across the spinning wheel..."
+        if self.progress >= 1.0:
             self.complete()
 
 

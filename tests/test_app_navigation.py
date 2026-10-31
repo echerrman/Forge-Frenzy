@@ -2,6 +2,7 @@ import os
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 
 import pygame
+import pytest
 from game.app import GameApp
 from game.scenes.station_scene import AREA_INFO
 
@@ -19,8 +20,10 @@ def test_app_can_visit_every_work_area():
 
 def test_display_modes_can_be_applied_and_return_to_windowed():
     app = GameApp()
-    for mode in ("borderless", "fullscreen", "windowed"):
+    for mode in ("fullscreen", "windowed"):
         app.set_display_mode(mode)
     assert app.display_mode == "windowed"
     assert app.viewport.width > 0 and app.viewport.height > 0
+    with pytest.raises(ValueError):
+        app.set_display_mode("borderless")
     pygame.quit()

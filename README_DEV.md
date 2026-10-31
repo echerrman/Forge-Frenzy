@@ -22,8 +22,8 @@ Start a workday, accept the displayed order at the Customer Counter, click a met
 - Mold: click the matching mold, click Current Work, then hold the ladle until full.
 - Anvil: click Current Work, then click all glowing blade targets.
 - Quench: click Current Work, drag the blade into the water, and hold continuously until complete.
-- Grindstone: click Current Work, then click the forgiving edge markers.
+- Grindstone: click Current Work, click the crank seven times, then hold and sweep the blade horizontally across the wheel. Spin resets on station exit while sharpening progress persists.
 - Assembly: click Current Work, then drag the requested handle and guard onto their targets.
 - Delivery: return to the Customer Counter and click it.
 
-The Options menu supports fullscreen, borderless windowed fullscreen, and windowed modes. Rendering uses a fixed 1280x720 logical canvas with aspect-ratio-preserving scaling.
+The Options menu supports fullscreen and windowed modes. Rendering uses a fixed 1280x720 logical canvas with aspect-ratio-preserving scaling.

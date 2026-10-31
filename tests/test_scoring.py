@@ -15,7 +15,7 @@ def completed_state():
     mold = MoldController(item, order); mold.select_mold("dagger"); mold.place(); mold.pour(3)
     anvil = AnvilController(item, order); anvil.place(); [anvil.hit(i) for i in range(5)]
     quench = QuenchController(item, order); quench.place(); quench.hold_in_water(3)
-    grind = GrindController(item, order); grind.place(); [grind.sharpen(i) for i in range(6)]
+    grind = GrindController(item, order); grind.place(); [grind.crank() for _ in range(grind.required_cranks)]; grind.sharpen_sweep(grind.required_sweep_distance)
     assembly = AssemblyController(item, order); assembly.place(); assembly.drop_component("handle", "oak"); assembly.drop_component("guard", "simple")
     return state
 

@@ -49,11 +49,11 @@ The introductory order is an iron dagger for Elin. The workpiece remains in the 
 - **Mold:** Select the matching mold, insert the workpiece, and hold the ladle until the mold is full.
 - **Anvil:** Place the blade and click every glowing hammer point.
 - **Quench tub:** Place the blade, drag it into the water, and hold continuously until quenched.
-- **Grindstone:** Place the blade and click each highlighted edge marker.
+- **Grindstone:** Place the blade, click the crank seven times to spin up the wheel, then hold the blade and sweep it left and right across the wheel until sharp. Wheel spin resets when leaving the station; sharpening progress remains.
 - **Assembly:** Place the blade and drag the requested handle and guard onto their target areas.
 - **Delivery:** Return to the Customer Counter and click it.
 
-Press **Escape** to return to the previous screen. The Options menu supports fullscreen, windowed fullscreen, and windowed display modes.
+Press **Escape** to return to the previous screen. The Options menu supports fullscreen and windowed display modes.
 
 ## Testing
 

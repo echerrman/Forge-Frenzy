@@ -1,0 +1,15 @@
+{
+  "source_canvas": [2560, 1440],
+  "runtime_canvas": [1280, 720],
+  "scale_to_runtime": 0.5,
+  "stations": {
+    "storage": {"source_rect": [220, 40, 600, 620], "runtime_rect": [110, 20, 300, 310]},
+    "mold": {"source_rect": [520, 450, 650, 500], "runtime_rect": [260, 225, 325, 250]},
+    "anvil": {"source_rect": [1450, 480, 600, 500], "runtime_rect": [725, 240, 300, 250]},
+    "furnace": {"source_rect": [1700, 0, 860, 780], "runtime_rect": [850, 0, 430, 390], "note": "interaction mask expands left to include the matching coal crate"},
+    "grindstone": {"source_rect": [0, 810, 720, 500], "runtime_rect": [0, 405, 360, 250]},
+    "assembly": {"source_rect": [760, 920, 1050, 500], "runtime_rect": [380, 460, 525, 250]},
+    "quench": {"source_rect": [1930, 780, 630, 580], "runtime_rect": [965, 390, 315, 290]},
+    "customer_counter": {"source_rect": [840, 220, 900, 310], "runtime_rect": [420, 110, 450, 155]}
+  }
+}

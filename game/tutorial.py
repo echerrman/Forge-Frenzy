@@ -13,15 +13,15 @@ ORDER_TICKET = pygame.Rect(910, 92, 340, 430)
 COUNTER = pygame.Rect(250, 275, 420, 150)
 
 SHOP_TARGETS = {
-    "shop_counter": pygame.Rect(455, 105, 370, 88),
-    "shop_storage": pygame.Rect(75, 185, 220, 190),
-    "shop_furnace": pygame.Rect(950, 180, 245, 190),
-    "shop_mold": pygame.Rect(330, 230, 190, 130),
-    "shop_anvil": pygame.Rect(690, 270, 205, 145),
-    "shop_quench": pygame.Rect(965, 430, 210, 145),
-    "shop_grindstone": pygame.Rect(90, 440, 245, 145),
-    "shop_assembly": pygame.Rect(425, 455, 360, 130),
-    "shop_delivery": pygame.Rect(455, 105, 370, 88),
+    "shop_counter": pygame.Rect(420, 110, 450, 155),
+    "shop_storage": pygame.Rect(110, 70, 300, 260),
+    "shop_furnace": pygame.Rect(850, 70, 430, 320),
+    "shop_mold": pygame.Rect(260, 225, 325, 250),
+    "shop_anvil": pygame.Rect(725, 240, 300, 250),
+    "shop_quench": pygame.Rect(965, 390, 315, 290),
+    "shop_grindstone": pygame.Rect(0, 405, 360, 250),
+    "shop_assembly": pygame.Rect(380, 460, 525, 170),
+    "shop_delivery": pygame.Rect(420, 110, 450, 155),
 }
 
 STATION_TARGETS = {

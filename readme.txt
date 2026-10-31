@@ -47,6 +47,6 @@ Detailed controls:
 
 Known unfinished features: artwork and animation remain procedural and minimal. Advanced upgrades, audio, elaborate inventory economy, and later-game content are not implemented.
 
-Third-party assets: none. Visuals use procedural Pygame shapes and system fonts.
+Third-party downloaded assets: none. The workshop and character artwork was generated specifically for this project with OpenAI ImageGen from the project's original art direction and references. Other screens use procedural Pygame shapes and system fonts.
 
 Individual work list: all currently implemented code and procedural visuals were developed for this individual course project.

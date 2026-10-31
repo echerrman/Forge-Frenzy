@@ -37,6 +37,14 @@ GRIND_BLADE_Y = 255
 GRIND_MIN_X = 355
 GRIND_MAX_X = 650
 ASSEMBLY_BLADE = pygame.Rect(300, 270, 390, 130)
+ASSEMBLY_COMPONENT_CARDS = (
+    ("handle", "oak", pygame.Rect(95, 170, 145, 50)),
+    ("handle", "leather", pygame.Rect(95, 230, 145, 50)),
+    ("handle", "walnut", pygame.Rect(95, 290, 145, 50)),
+    ("guard", "simple", pygame.Rect(95, 380, 145, 50)),
+    ("guard", "cross", pygame.Rect(95, 440, 145, 50)),
+    ("guard", "curved", pygame.Rect(95, 500, 145, 50)),
+)
 
 ANVIL_TARGETS = [(310, 330), (390, 350), (470, 330), (550, 350), (630, 330)]
 
@@ -353,24 +361,20 @@ class StationScene(BaseScene):
         text(surface, prompt, self.app.assets.font(17, True), config.CREAM, (500, 545), True)
 
     def _component_cards(self):
-        order = self.app.game_state.active_order
-        handle = order.required_components["handle"] if order else "oak"
-        guard = order.required_components["guard"] if order else "simple"
-        alternatives = "leather" if handle != "leather" else "oak"
-        guard_alt = "cross" if guard != "cross" else "simple"
-        return [
-            ("handle", handle, pygame.Rect(95, 170, 145, 70)),
-            ("handle", alternatives, pygame.Rect(95, 255, 145, 70)),
-            ("guard", guard, pygame.Rect(95, 360, 145, 70)),
-            ("guard", guard_alt, pygame.Rect(95, 445, 145, 70)),
-        ]
+        return [(kind, value, rect.copy()) for kind, value, rect in ASSEMBLY_COMPONENT_CARDS]
 
     def _assembly_target(self, kind):
         return pygame.Rect(570, 330, 140, 90) if kind == "handle" else pygame.Rect(410, 300, 120, 120)
 
     def _draw_assembly(self, surface):
+        text(surface, "HANDLES", self.app.assets.font(14, True), config.CREAM, (167, 154), True)
+        text(surface, "GUARDS", self.app.assets.font(14, True), config.CREAM, (167, 364), True)
+        order = self.app.game_state.active_order
+        required = order.required_components if order else {}
         for kind, value, rect in self._component_cards():
             pygame.draw.rect(surface, config.WOOD if kind == "handle" else config.METAL, rect, border_radius=9)
+            if required.get(kind) == value:
+                pygame.draw.rect(surface, config.ORANGE, rect, 3, border_radius=9)
             text(surface, value.title(), self.app.assets.font(17, True), config.CREAM, rect.center, True)
         workpiece = self.app.game_state.active_workpiece
         if workpiece and workpiece.location == "assembly":
